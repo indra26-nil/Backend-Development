@@ -1,11 +1,17 @@
 import express from "express";
+import studentModel from "./models/notes.model.js";
 const app = express();
 
 app.use(express.json());
-const notes = [];
 
-app.post("/create", (req, res) => {
-  notes.push(req.body);
+app.post("/create", async(req, res) => {
+  const data = req.body;
+  
+  await studentModel.create({
+    name:data.name,
+    roll:data.roll,
+    address:data.address
+  })
   console.log("created..");
 
   res.status(201).json({
@@ -13,17 +19,30 @@ app.post("/create", (req, res) => {
   });
 });
 
-app.get("/view", (req, res) => {
+app.get("/view", async(req, res) => {
+  const notes = await studentModel.find()
   console.log(notes);
-
+  
   res.status(200).json({
     message: "fetched successfully..",
     notes: notes,
   });
 });
-app.delete("/delete/:index", (req, res) => {
-  const index = req.params.index;
-  delete notes[index];
+
+app.get("/viewone/:_name", async(req, res) => {
+  const notes = await studentModel.findOne({
+    name:"_name"
+  })
+  console.log(notes);
+  
+  res.status(200).json({
+    message: "fetched successfully..",
+    notes: notes,
+  });
+});
+
+app.delete("/delete/:index", async(req, res) => {
+  await 
   res.status(200).json({
     message: "deleted successfully..",
   });
@@ -37,5 +56,4 @@ app.patch("/edit/:index", (req, res) => {
     message: "edited successfully..",
   });
 });
-
 export default app;
